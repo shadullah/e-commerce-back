@@ -27,6 +27,14 @@ const productSchema = new mongoose.Schema(
       default: true,
       type: Boolean,
     },
+    viewed: {
+      default: false,
+      type: Boolean,
+    },
+    top_sold: {
+      default: true,
+      type: Boolean,
+    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",

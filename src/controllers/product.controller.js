@@ -53,6 +53,26 @@ const AddProduct = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, createProduct, "Product Added success"));
 });
 
+// const updateExistingProductsOnStartup = async () => {
+//   try {
+//     await Product.updateMany(
+//       {},
+//       {
+//         $set: {
+//           viewed: false,
+//           top_sold: true,
+//         },
+//       }
+//     );
+//     console.log("Existing products updated successfully!");
+//   } catch (error) {
+//     console.error("Error updating products: ", error);
+//   }
+// };
+
+// // Call this function when the server starts
+// updateExistingProductsOnStartup();
+
 const Allproducts = asyncHandler(async (req, res) => {
   const products = await Product.find({});
 
