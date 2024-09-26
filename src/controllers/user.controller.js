@@ -1,8 +1,16 @@
 import { User } from "../models/user.model.js";
+import { Token } from "../models/token.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+// import { v4 as uuidv4 } from "uuid";
+import crypto from "crypto";
+import { sendEmail } from "../utils/sendEmail.js";
+
+const genToken = () => {
+  return uuidv4();
+};
 
 const generateAccessTokenAndRefreshTokens = async (userId) => {
   try {
@@ -63,13 +71,27 @@ const registerUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
+  const token = await new Token({
+    userId: user._id,
+    token: crypto.randomBytes(32).toString("hex"),
+  }).save();
+
+  const url = `${process.env.BASE_URL}users/${user._id}/verify/${token.token}`;
+  await sendEmail(user.email, "Verify Email", url);
+
   if (!createdUser) {
     throw new ApiError(500, "Something wrong registering the User");
   }
 
   return res
     .status(201)
-    .json(new ApiResponse(200, createdUser, "User created successfully!!"));
+    .json(
+      new ApiResponse(
+        200,
+        createdUser,
+        "User email verification sent successfully!!"
+      )
+    );
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -89,6 +111,22 @@ const loginUser = asyncHandler(async (req, res) => {
   const isPasswordCorrect = await user.isPasswordCorrect(password);
   if (!isPasswordCorrect) {
     throw new ApiError(400, "Invalid user credentials");
+  }
+
+  if (!user.isVerified) {
+    let token = await Token.findOne({ userId: user._id });
+    if (!token) {
+      token = await new Token({
+        userId: user._id,
+        token: crypto.randomBytes(32).toString("hex"),
+      }).save();
+      const url = `${process.env.BASE_URL}users/${user.id}/verify/${token.token}`;
+      await sendEmail(user.email, "Verify Email", url);
+    }
+
+    return res
+      .status(400)
+      .send({ message: "An Email sent to your account please verify" });
   }
 
   const { accessToken, refreshToken } =
@@ -152,7 +190,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Users not found");
   }
 
-  res.status(200).json(new ApiResponse(200, users, "all users fetched"));
+  return res.status(200).json(new ApiResponse(200, users, "all users fetched"));
 });
 
 const singleUser = asyncHandler(async (req, res) => {
@@ -168,7 +206,41 @@ const singleUser = asyncHandler(async (req, res) => {
     throw new ApiError(404, "user does not exist");
   }
 
-  res.status(200).json(new ApiResponse(200, user, "user fetched successfully"));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "user fetched successfully"));
 });
 
-export { registerUser, loginUser, logoutUser, getAllUsers, singleUser };
+const getToken = asyncHandler(async (req, res) => {
+  const user = await User.findOne({ _id: req.params.id });
+  console.log(user);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const token = await Token.findOne({
+    userId: user._id,
+    token: req.params.token,
+  });
+
+  console.log(token);
+  if (!token) {
+    throw new ApiError(400, "Invalid link");
+  }
+
+  await User.updateOne({ _id: user._id }, { isVerified: true });
+  await token.deleteOne();
+
+  return res.status(200).send({ message: "email verified" });
+  // .json(new ApiResponse(200, _, "Email verified successfully!!"));
+});
+
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  getAllUsers,
+  singleUser,
+  getToken,
+};

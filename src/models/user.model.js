@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin", "super admin"],
       default: "user",
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
     refreshToken: {
       type: String,
     },
