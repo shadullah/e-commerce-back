@@ -74,7 +74,15 @@ const AddProduct = asyncHandler(async (req, res) => {
 // updateExistingProductsOnStartup();
 
 const Allproducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({});
+  const { search } = req.query;
+
+  const query = search
+    ? {
+        $or: [{ name: { $regex: search, $options: "i" } }],
+      }
+    : {};
+
+  const products = await Product.find(query);
 
   if (!products || products.length === 0) {
     throw new ApiError(404, "products not found");
