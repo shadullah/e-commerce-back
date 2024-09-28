@@ -75,7 +75,7 @@ const updateOneCart = asyncHandler(async (req, res) => {
     throw new ApiError(404, "cart not found");
   }
 
-  cart.quantity += quantity;
+  cart.quantity = quantity;
 
   const updatedCart = await cart.save();
   console.log(updatedCart);
