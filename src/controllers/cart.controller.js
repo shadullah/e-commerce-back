@@ -24,6 +24,15 @@ const addItemToOrder = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Customer not found");
   }
 
+  const existingItem = await Cart.findOne({
+    customer,
+    productId,
+  });
+
+  if (existingItem) {
+    throw new ApiError(400, "Product already in the cart");
+  }
+
   let itemOrdered = await Cart.create({
     customer,
     productId,
@@ -66,12 +75,9 @@ const updateOneCart = asyncHandler(async (req, res) => {
     throw new ApiError(404, "cart not found");
   }
 
-  if (quantity) {
-    cart.quantity = quantity;
-    cart.price = quantity * cart.price;
-  }
+  cart.quantity += quantity;
 
-  const updatedCart = await cartId.save();
+  const updatedCart = await cart.save();
   console.log(updatedCart);
 
   return res
