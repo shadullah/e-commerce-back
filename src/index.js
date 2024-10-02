@@ -26,9 +26,9 @@ app.post("/create-payment", async (req, res) => {
     total_amount: payInfo.amount,
     currency: "EUR",
     tran_id: trxId,
-    success_url: "http://localhost:8000/payment/success",
-    fail_url: "http://localhost:8000/payment/failed",
-    cancel_url: "http://localhost:8000/payment/cancelled",
+    success_url: "http://localhost:8000/success",
+    fail_url: "http://localhost:8000/failed",
+    cancel_url: "http://localhost:8000/cancelled",
     cus_name: "Customer Name",
     cus_email: "cust@yahoo.com",
     cus_add1: "Dhaka",
@@ -105,14 +105,11 @@ app.post("/success", async (req, res) => {
     if (!updatedPayment) {
       throw new ApiError(404, "Payment not found");
     }
-    res
-      .status(200)
-      .json({ message: "Payment successfull", payment: updatedPayment });
+    res.status(200).redirect("http://localhost:3000/payment/success");
   } catch (error) {
     console.error("Payment update failed", error.message);
     res.status(500).json({ error: "Payment update failed" });
   }
-  res.redirect("http://localhost:3000/payment/success");
   console.log("successData", successdata);
 });
 
