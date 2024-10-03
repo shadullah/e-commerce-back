@@ -71,13 +71,13 @@ const registerUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
-  const token = await new Token({
-    userId: user._id,
-    token: crypto.randomBytes(32).toString("hex"),
-  }).save();
+  // const token = await new Token({
+  //   userId: user._id,
+  //   token: crypto.randomBytes(32).toString("hex"),
+  // }).save();
 
-  const url = `${process.env.BASE_URL}users/${user._id}/verify/${token.token}`;
-  await sendEmail(user.email, "Verify Email", url);
+  // const url = `${process.env.BASE_URL}users/${user._id}/verify/${token.token}`;
+  // await sendEmail(user.email, "Verify Email", url);
 
   if (!createdUser) {
     throw new ApiError(500, "Something wrong registering the User");
