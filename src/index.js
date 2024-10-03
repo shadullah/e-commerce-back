@@ -131,12 +131,12 @@ app.post("/cancelled", async (req, res) => {
   }
 });
 
-// connectDB()
-//   .then(() => {
-//     app.listen(process.env.PORT || 8000, () => {
-//       console.log(`Server is running at ${process.env.PORT}`);
-//     });
-//   })
-//   .catch((err) => {
-//     console.log("mongodb connection failed", err);
-//   });
+connectDB()
+  .then(() => {
+    app.listen(process.env.PORT || 8000, () => {
+      console.log(`Server is running at ${process.env.PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log("mongodb connection failed", err);
+  });
