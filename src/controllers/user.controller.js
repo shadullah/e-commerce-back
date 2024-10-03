@@ -47,24 +47,24 @@ const registerUser = asyncHandler(async (req, res) => {
 
   console.log(req.files);
 
-  const photoLocalPath = req.files?.photo[0]?.path;
+  // const photoLocalPath = req.files?.photo[0]?.path;
 
-  if (!photoLocalPath) {
-    throw new ApiError(400, "Photo file is required");
-  }
+  // if (!photoLocalPath) {
+  //   throw new ApiError(400, "Photo file is required");
+  // }
 
-  const photo = await uploadOnCloudinary(photoLocalPath);
+  // const photo = await uploadOnCloudinary(photoLocalPath);
 
-  if (!photo) {
-    throw new ApiError(400, "photo file is required");
-  }
+  // if (!photo) {
+  //   throw new ApiError(400, "photo file is required");
+  // }
 
   const user = await User.create({
     fullname,
     email,
     password,
     role,
-    photo: photo?.url,
+    // photo: photo?.url,
   });
 
   const createdUser = await User.findById(user._id).select(
