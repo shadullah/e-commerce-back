@@ -6,7 +6,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://e-commerce-front-blond-three.vercel.app",
+    origin: [
+      "https://e-commerce-front-blond-three.vercel.app",
+      "http://localhost:3000",
+    ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
