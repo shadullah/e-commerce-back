@@ -10,7 +10,12 @@
         {
             "src": "/(.*)",
             "dest":"/src",
-            "methods":["GET", "POST", "PUT","PATCH", "DELETE"]
+            "methods":["GET", "POST", "PUT","PATCH", "DELETE"],
+            "headers": {
+                "Access-Control-Allow-Origin": "https://e-commerce-front-blond-three.vercel.app",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            }
         }
     ]
 }
