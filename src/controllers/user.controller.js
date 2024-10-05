@@ -48,9 +48,8 @@ const registerUser = asyncHandler(async (req, res) => {
       throw new ApiError(409, "User with email or username already exists");
     }
 
-    console.log(req.files);
-
-    const photoLocalPath = req.files?.photo[0]?.path;
+    const photoLocalPath = `./${req.files?.photo[0]?.path}`;
+    console.log(photoLocalPath);
 
     if (!photoLocalPath) {
       throw new ApiError(400, "Photo file is required");
