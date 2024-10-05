@@ -39,31 +39,36 @@ const registerUser = asyncHandler(async (req, res) => {
     if (
       [fullname, email, password, role].some((field) => field?.trim() === "")
     ) {
-      throw new ApiError(400, "all fields are required");
+      // throw new ApiError(400, "all fields are required");
+      res.send("fileds are require");
     }
 
     const existedUser = await User.findOne({ email });
 
     if (existedUser) {
-      throw new ApiError(409, "User with email or username already exists");
+      // throw new ApiError(409, "User with email or username already exists");
+      res.send("email exist");
     }
 
     const photoLocalPath = `./${req.files?.photo[0]?.path}`;
     console.log(photoLocalPath);
 
     if (!photoLocalPath) {
-      throw new ApiError(400, "Photo file is required");
+      // throw new ApiError(400, "Photo file is required");
+      res.status(400).send({ message: "photo file required" });
     }
 
     let photo;
     try {
       photo = await uploadOnCloudinary(photoLocalPath);
       if (!photo) {
-        throw new ApiError(400, "Photo file upload failed.");
+        // throw new ApiError(400, "Photo file upload failed.");
+        res.status(400).send({ message: "photo file upload feiled" });
       }
     } catch (error) {
       console.error("Cloudinary Upload Error: ", error);
-      throw new ApiError(500, "Internal server error during photo upload.");
+      // throw new ApiError(500, "Internal server error during photo upload.");
+      res.status(400).send({ message: "cloudinary error", error });
     }
 
     const user = await User.create({
@@ -87,7 +92,8 @@ const registerUser = asyncHandler(async (req, res) => {
     await sendEmail(user.email, "Verify Email", url);
 
     if (!createdUser) {
-      throw new ApiError(500, "Something wrong registering the User");
+      // throw new ApiError(500, "Something wrong registering the User");
+      res.status(400).send({ message: "creeted usernot success" });
     }
 
     return res
