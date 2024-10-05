@@ -47,17 +47,17 @@ const registerUser = asyncHandler(async (req, res) => {
 
   console.log(req.files);
 
-  // const photoLocalPath = req.files?.photo[0]?.path;
+  const photoLocalPath = req.files?.photo[0]?.path;
 
-  // if (!photoLocalPath) {
-  //   throw new ApiError(400, "Photo file is required");
-  // }
+  if (!photoLocalPath) {
+    throw new ApiError(400, "Photo file is required");
+  }
 
-  // const photo = await uploadOnCloudinary(photoLocalPath);
+  const photo = await uploadOnCloudinary(photoLocalPath);
 
-  // if (!photo) {
-  //   throw new ApiError(400, "photo file is required");
-  // }
+  if (!photo) {
+    throw new ApiError(400, "photo file is required");
+  }
 
   const user = await User.create({
     fullname,
@@ -71,13 +71,13 @@ const registerUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
-  // const token = await new Token({
-  //   userId: user._id,
-  //   token: crypto.randomBytes(32).toString("hex"),
-  // }).save();
+  const token = await new Token({
+    userId: user._id,
+    token: crypto.randomBytes(32).toString("hex"),
+  }).save();
 
-  // const url = `${process.env.BASE_URL}users/${user._id}/verify/${token.token}`;
-  // await sendEmail(user.email, "Verify Email", url);
+  const url = `${process.env.BASE_URL}users/${user._id}/verify/${token.token}`;
+  await sendEmail(user.email, "Verify Email", url);
 
   if (!createdUser) {
     throw new ApiError(500, "Something wrong registering the User");
