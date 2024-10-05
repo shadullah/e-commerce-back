@@ -53,17 +53,16 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Photo file is required");
   }
 
-  const photo = await uploadOnCloudinary(photoLocalPath);
+  let photo;
+  try {
+    photo = await uploadOnCloudinary(photoLocalPath);
     if (!photo) {
       throw new ApiError(400, "Photo file upload failed.");
     }
-
-  // try {
-    
-  // } catch (error) {
-  //   console.error("Cloudinary Upload Error: ", error);
-  //   throw new ApiError(500, "Internal server error during photo upload.");
-  // }
+  } catch (error) {
+    console.error("Cloudinary Upload Error: ", error);
+    throw new ApiError(500, "Internal server error during photo upload.");
+  }
 
   const user = await User.create({
     fullname,
