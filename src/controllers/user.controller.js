@@ -100,7 +100,7 @@ const registerUser = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    res.status(400).json(new ApiResponse(400, createdUser, "something wrong"));
+    res.status(400).json(error);
     console.log(error);
   }
 });
