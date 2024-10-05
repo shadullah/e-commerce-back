@@ -64,7 +64,7 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     role,
-    // photo: photo?.url,
+    photo: photo?.url,
   });
 
   const createdUser = await User.findById(user._id).select(
