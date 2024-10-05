@@ -15,7 +15,7 @@ app.get("/", (req, res) => {
   res.send("welcome to lazz pharma backend");
 });
 
-app.post("/create-payment", async (req, res) => {
+app.post("/api/v1/create-payment", async (req, res) => {
   const payInfo = req.body;
 
   const trxId = new mongoose.Types.ObjectId().toString();
