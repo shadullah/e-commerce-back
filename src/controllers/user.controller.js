@@ -40,38 +40,40 @@ const registerUser = asyncHandler(async (req, res) => {
       [fullname, email, password, role].some((field) => field?.trim() === "")
     ) {
       // throw new ApiError(400, "all fields are required");
-      res.send("fileds are require");
+      res.send("all fields are required");
     }
 
     const existedUser = await User.findOne({ email });
 
     if (existedUser) {
       // throw new ApiError(409, "User with email or username already exists");
-      res.send("email exist");
+      return res.status(400).json(new ApiResponse(400, [], "email exist"));
     }
 
-    const photoLocalPath = `./${req.files?.photo[0]?.path}`;
+    console.log(req.files);
+
+    let photoLocalPath = "";
+    if (req.files && req.files?.photo && req.files?.photo.length > 0) {
+      photoLocalPath = req.files?.photo[0]?.path;
+    }
+    console.log(req.files);
     console.log(photoLocalPath);
 
     if (!photoLocalPath) {
       // throw new ApiError(400, "Photo file is required");
-      res.status(400).send({ message: "photo file required" });
+      return res.status(400).send({ message: "photo file required" });
     }
 
-    let photo;
-    try {
-      photo = await uploadOnCloudinary(photoLocalPath);
-      if (!photo) {
-        // throw new ApiError(400, "Photo file upload failed.");
-        res.status(400).send({ message: "photo file upload feiled" });
-      }
-    } catch (error) {
-      console.error("Cloudinary Upload Error: ", error);
-      // throw new ApiError(500, "Internal server error during photo upload.");
-      res.status(400).send({ message: "cloudinary error", error });
+    let photo = await uploadOnCloudinary(photoLocalPath);
+    if (!photo) {
+      // throw new ApiError(400, "Photo file upload failed.");
+      return res.status(400).send({
+        message:
+          "photo file upload failed || internal server error!! files unable to upload",
+      });
     }
 
-    const user = await User.create({
+    const createdUser = await User.create({
       fullname,
       email,
       password,
@@ -79,21 +81,23 @@ const registerUser = asyncHandler(async (req, res) => {
       photo: photo?.url,
     });
 
-    const createdUser = await User.findById(user._id).select(
+    const userData = await User.findById(createdUser._id).select(
       "-password -refreshToken"
     );
 
     const token = await new Token({
-      userId: user._id,
+      userId: createdUser._id,
       token: crypto.randomBytes(32).toString("hex"),
     }).save();
 
-    const url = `${process.env.BASE_URL}users/${user._id}/verify/${token.token}`;
-    await sendEmail(user.email, "Verify Email", url);
+    const url = `${process.env.BASE_URL}users/${createdUser._id}/verify/${token.token}`;
+    await sendEmail(createdUser.email, "Verify Email", url);
 
-    if (!createdUser) {
+    if (!userData) {
       // throw new ApiError(500, "Something wrong registering the User");
-      res.status(400).send({ message: "creeted usernot success" });
+      return res
+        .status(500)
+        .send({ message: "Something wrong registering the User" });
     }
 
     return res
@@ -101,7 +105,7 @@ const registerUser = asyncHandler(async (req, res) => {
       .json(
         new ApiResponse(
           200,
-          createdUser,
+          userData,
           "User email verification sent successfully!!"
         )
       );

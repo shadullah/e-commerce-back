@@ -5,26 +5,26 @@ cloudinary.config({
   cloud_name: "dhbkhhdn2",
   api_key: "729593573772394",
   api_secret: "uL3lev8W3kQyXZm-dWz-HhxJIOo",
-  secure: false,
+  // secure: false,
 });
 
 const uploadOnCloudinary = async (localFilePath) => {
   try {
     if (!localFilePath) return null;
 
+    console.log("uploading photo....");
+
     const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: "auto",
+      folder: "public/img",
     });
     console.log("file is uploaded on cloudinary", response.url);
     console.log(localFilePath);
-    // fs.unlinkSync(localFilePath);
-    res.status(400).send({ message: "fild uploaded on cloudinary" });
+    fs.unlinkSync(localFilePath);
     return response;
   } catch (err) {
-    console.log(err);
-    // fs.unlinkSync(localFilePath);
-    res.status(400).send({ message: "something went wrong on cloudinary" });
-
+    fs.unlinkSync(localFilePath);
+    console.log("CLOUDINARY :: FILE UPLOAD ERROR ", err);
     return null;
   }
 };
