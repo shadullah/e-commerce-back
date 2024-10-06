@@ -18,13 +18,19 @@ const uploadOnCloudinary = async (localFilePath) => {
       resource_type: "auto",
       folder: "public/img",
     });
+
     console.log("file is uploaded on cloudinary", response.url);
-    console.log(localFilePath);
+
+    // clean up the local file
     fs.unlinkSync(localFilePath);
     return response;
   } catch (err) {
-    fs.unlinkSync(localFilePath);
     console.log("CLOUDINARY :: FILE UPLOAD ERROR ", err);
+
+    // attemp to clean up the file in case of error
+    if (fs.existsSync(localFilePath)) {
+      fs.unlinkSync(localFilePath);
+    }
     return null;
   }
 };
