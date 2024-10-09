@@ -55,7 +55,9 @@ const addItemToOrder = asyncHandler(async (req, res) => {
 // Get all Cart items
 const getCartItems = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const cart = await Cart.find({ customer: id });
+  const cart = await Cart.findOne({ customer: id }).populate(
+    "cartItems.productId"
+  );
 
   if (!cart) {
     throw new ApiError(400, "Cart is empty");
