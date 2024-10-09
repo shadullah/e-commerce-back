@@ -24,30 +24,32 @@ const addItemToOrder = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Customer not found");
   }
 
-  const existingItem = await Cart.findOne({
-    customer,
-    productId,
-  });
+  let cart = await Cart.findOne({ customer });
 
-  if (existingItem) {
-    throw new ApiError(400, "Product already in the cart");
+  if (!cart) {
+    cart = new Cart({
+      customer,
+      cartItems: [{ productId, quantity }],
+    });
+  } else {
+    const existingItem = cart.cartItems.find(
+      (item) => item.productId.toString() === productId
+    );
+    if (existingItem) {
+      throw new ApiError(400, "Product already in the cart");
+    }
+
+    cart.cartItems.push({ productId, quantity });
   }
 
-  let itemOrdered = await Cart.create({
-    customer,
-    productId,
-    quantity,
-  });
+  await cart.save();
 
-  if (!itemOrdered) {
-    throw new ApiError(400, "Error in creating cart item");
-  }
+  await cart.populate("cartItems.productId");
+  // await cart.populate("cartItems.productId").execPopulate();
 
-  itemOrdered = await itemOrdered.populate("productId");
-
-  res
+  return res
     .status(200)
-    .json(new ApiResponse(200, itemOrdered, "Cart item created successfully"));
+    .json(new ApiResponse(200, cart, "Cart item created successfully"));
 });
 
 // Get all Cart items

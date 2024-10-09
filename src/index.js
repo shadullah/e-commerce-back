@@ -23,7 +23,7 @@ app.post("/api/v1/create-payment", async (req, res) => {
   const initiateData = {
     store_id: "ss66f78af2baee0",
     store_passwd: "ss66f78af2baee0@ssl",
-    total_amount: payInfo.amount,
+    total_amount: payInfo.orderPrice,
     currency: "EUR",
     tran_id: trxId,
     success_url: "http://localhost:8000/success",

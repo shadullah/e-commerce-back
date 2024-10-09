@@ -6,6 +6,10 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    customer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     status: {
       type: String,
       enum: ["PENDING", "CANCELLED", "DELIVERED"],
@@ -15,15 +19,15 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Cart",
     },
+    address: {
+      type: String,
+      required: true,
+    },
     division: {
       type: String,
       required: true,
     },
     district: {
-      type: String,
-      required: true,
-    },
-    address: {
       type: String,
       required: true,
     },
