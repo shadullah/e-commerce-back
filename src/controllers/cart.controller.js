@@ -71,7 +71,7 @@ const getCartItems = asyncHandler(async (req, res) => {
 const updateOneCart = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const { quantity } = req.body;
+  const { productId, quantity } = req.body;
 
   const cart = await Cart.findById(id);
 
@@ -79,7 +79,15 @@ const updateOneCart = asyncHandler(async (req, res) => {
     throw new ApiError(404, "cart not found");
   }
 
-  cart.quantity = quantity;
+  const itemIndex = cart.cartItems.findIndex(
+    (item) => item.productId.toString() === productId
+  );
+
+  if (itemIndex === -1) {
+    throw new ApiError(404, "Item not found in cart");
+  }
+
+  cart.cartItems[itemIndex].quantity = quantity;
 
   const updatedCart = await cart.save();
   console.log(updatedCart);
