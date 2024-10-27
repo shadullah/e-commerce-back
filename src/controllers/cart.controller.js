@@ -90,32 +90,29 @@ const updateOneCart = asyncHandler(async (req, res) => {
 });
 
 const deleteAItem = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const { customerId } = req.body;
+  const { id, productId } = req.params;
 
-  const cartItem = await Cart.findById(id);
+  const cart = await Cart.findOne({ customer: id });
 
-  if (!cartItem) {
-    throw new ApiError(404, "Cart Item not found");
-  }
-  console.log(customerId);
-  console.log(cartItem.customer.toString());
-
-  if (cartItem.customer.toString() !== customerId) {
-    throw new ApiError(403, "Unauthorized to delete this Item");
+  if (!cart) {
+    throw new ApiError(404, "Cart not found");
   }
 
-  const deleteUserCartItem = await Cart.findByIdAndDelete(id);
+  const intialItemCount = cart.cartItems.length;
 
-  if (!deleteUserCartItem) {
-    throw new ApiError(500, "Something wrong in deleting cartItem");
+  cart.cartItems = cart.cartItems.filter(
+    (item) => item.productId.toString() !== productId
+  );
+
+  if (cart.cartItems.length === intialItemCount) {
+    throw new ApiError(404, "product not found in the cart");
   }
+
+  await cart.save();
 
   return res
     .status(200)
-    .json(
-      new ApiResponse(200, deleteUserCartItem, "cart item deleted successfully")
-    );
+    .json(new ApiResponse(200, cart, "cart item deleted successfully"));
 });
 
 export { addItemToOrder, getCartItems, updateOneCart, deleteAItem };

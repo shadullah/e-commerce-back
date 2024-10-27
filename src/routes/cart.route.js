@@ -12,6 +12,6 @@ const router = Router();
 router.route("/create").post(verifyJWT, addItemToOrder);
 router.route("/user/:id").get(getCartItems);
 router.route("/:id").patch(updateOneCart);
-router.route("/user/:id").delete(deleteAItem);
+router.route("/user/:id/product/:productId").delete(deleteAItem);
 
 export default router;
