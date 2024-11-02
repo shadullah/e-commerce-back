@@ -16,14 +16,15 @@ app.get("/", (req, res) => {
 });
 
 app.post("/api/v1/create-payment", async (req, res) => {
-  const payInfo = req.body;
+  const { amount, customerId } = req.body;
 
   const trxId = new mongoose.Types.ObjectId().toString();
 
   const initiateData = {
     store_id: "ss66f78af2baee0",
     store_passwd: "ss66f78af2baee0@ssl",
-    total_amount: payInfo.orderPrice,
+    total_amount: amount,
+    // orderPrice: payInfo.orderPrice,
     currency: "EUR",
     tran_id: trxId,
     success_url: "http://localhost:8000/success",
@@ -67,10 +68,12 @@ app.post("/api/v1/create-payment", async (req, res) => {
       },
     });
 
+    // console.log(amount);
+
     const newPayment = new Payment({
-      customer: "Shad",
+      customer: new mongoose.Types.ObjectId(customerId),
       paymentId: trxId,
-      amount: payInfo.amount,
+      orderPrice: amount,
       status: "Pending",
     });
 
