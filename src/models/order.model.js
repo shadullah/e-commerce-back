@@ -23,12 +23,16 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    division: {
+    city: {
       type: String,
       required: true,
     },
     district: {
       type: String,
+      required: true,
+    },
+    zip: {
+      type: Number,
       required: true,
     },
     phone: {
