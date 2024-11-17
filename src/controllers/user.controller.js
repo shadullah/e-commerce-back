@@ -126,12 +126,18 @@ const loginUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    throw new ApiError(404, "User does not exists");
+    // throw new ApiError(404, "User does not exists");
+    return res
+      .status(404)
+      .json(new ApiResponse(404, [], "User does not exists"));
   }
 
   const isPasswordCorrect = await user.isPasswordCorrect(password);
   if (!isPasswordCorrect) {
-    throw new ApiError(400, "Invalid user credentials");
+    // throw new ApiError(400, "Invalid user credentials");
+    return res
+      .status(404)
+      .json(new ApiResponse(404, [], "Invalid user credentials"));
   }
 
   if (!user.isVerified) {
