@@ -80,13 +80,19 @@ const Allproducts = asyncHandler(async (req, res) => {
 
   const totalRecords = await Product.countDocuments();
 
-  const { search } = req.query;
+  const { search, stock } = req.query;
 
-  const query = search
-    ? {
-        $or: [{ name: { $regex: search, $options: "i" } }],
-      }
-    : {};
+  const query = {};
+
+  if (search) {
+    query.$or = [{ name: { $regex: search, $options: "i" } }];
+  }
+
+  if (stock === "true") {
+    query.stock = true;
+  } else if (stock === "false") {
+    query.stock = false;
+  }
 
   const products = await Product.find(query).limit(limit).skip(skip);
 
