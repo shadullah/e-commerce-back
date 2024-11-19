@@ -98,9 +98,9 @@ const Allproducts = asyncHandler(async (req, res) => {
   // sorting here
   let sortOption = {};
 
-  if (sort === "sort-asc") {
+  if (sort === "true") {
     sortOption.price = 1;
-  } else if (sort === "sort-desc") {
+  } else if (sort === "false") {
     sortOption.price = -1;
   }
 
