@@ -80,7 +80,7 @@ const Allproducts = asyncHandler(async (req, res) => {
 
   const totalRecords = await Product.countDocuments();
 
-  const { search, stock } = req.query;
+  const { search, stock, sort } = req.query;
 
   const query = {};
 
@@ -88,13 +88,26 @@ const Allproducts = asyncHandler(async (req, res) => {
     query.$or = [{ name: { $regex: search, $options: "i" } }];
   }
 
+  // stock available condition
   if (stock === "true") {
     query.stock = true;
   } else if (stock === "false") {
     query.stock = false;
   }
 
-  const products = await Product.find(query).limit(limit).skip(skip);
+  // sorting here
+  let sortOption = {};
+
+  if (sort === "sort-asc") {
+    sortOption.price = 1;
+  } else if (sort === "sort-desc") {
+    sortOption.price = -1;
+  }
+
+  const products = await Product.find(query)
+    .limit(limit)
+    .skip(skip)
+    .sort(sortOption);
 
   if (!products || products.length === 0) {
     throw new ApiError(404, "products not found");
