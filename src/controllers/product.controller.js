@@ -6,10 +6,11 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const AddProduct = asyncHandler(async (req, res) => {
-  const { name, description, price, discount, stock, category } = req.body;
+  const { name, description, price, discount, stock, category, owner } =
+    req.body;
   console.log(req.body);
 
-  if ([name, description, price].some((field) => field?.trim() === "")) {
+  if ([name, description, price, owner].some((field) => field?.trim() === "")) {
     throw new ApiError(400, "All fields are required");
   }
 
@@ -41,7 +42,7 @@ const AddProduct = asyncHandler(async (req, res) => {
     stock,
     productImage: productImage?.url,
     category,
-    owner: req.user?._id,
+    owner: owner,
   });
 
   if (!createProduct) {
@@ -52,26 +53,6 @@ const AddProduct = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, createProduct, "Product Added success"));
 });
-
-// const updateExistingProductsOnStartup = async () => {
-//   try {
-//     await Product.updateMany(
-//       {},
-//       {
-//         $set: {
-//           viewed: false,
-//           top_sold: true,
-//         },
-//       }
-//     );
-//     console.log("Existing products updated successfully!");
-//   } catch (error) {
-//     console.error("Error updating products: ", error);
-//   }
-// };
-
-// // Call this function when the server starts
-// updateExistingProductsOnStartup();
 
 const Allproducts = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1;
