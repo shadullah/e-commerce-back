@@ -61,7 +61,7 @@ const Allproducts = asyncHandler(async (req, res) => {
 
   const totalRecords = await Product.countDocuments();
 
-  const { search, stock, sort } = req.query;
+  const { search, stock, sort, category } = req.query;
 
   const query = {};
 
@@ -74,6 +74,10 @@ const Allproducts = asyncHandler(async (req, res) => {
     query.stock = true;
   } else if (stock === "false") {
     query.stock = false;
+  }
+
+  if (category) {
+    query.category = category;
   }
 
   // sorting here
