@@ -47,7 +47,7 @@ const createOrder = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, placeOrder, "Order Created success"));
+    .json(new ApiResponse(200, placeOrder, "Order placed succes!!"));
 });
 
 export { createOrder };
