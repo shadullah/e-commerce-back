@@ -1,4 +1,7 @@
+import mongoose from "mongoose";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import axios from "axios";
+import { Payment } from "../models/payment.model.js";
 
 const paymentInitiate = asyncHandler(async (req, res) => {
   const { customer, orderPrice } = req.body;
