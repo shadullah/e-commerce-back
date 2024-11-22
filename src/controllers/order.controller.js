@@ -5,14 +5,21 @@ import { Order } from "../models/order.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const createOrder = asyncHandler(async (req, res) => {
-  const { orderPrice, division, district, address, phone, orderItems } =
-    req.body;
+  const {
+    orderPrice,
+    customer,
+    status,
+    orderItems,
+    address,
+    city,
+    district,
+    zip,
+    phone,
+  } = req.body;
 
-  if (
-    [orderPrice, division, district, address, phone].some(
-      (field) => field.trim() === ""
-    )
-  ) {
+  console.log("request body: ", req.body);
+
+  if ([district, address, city].some((field) => field?.trim() === "")) {
     throw new ApiError(400, "All fields are required");
   }
 
@@ -24,11 +31,14 @@ const createOrder = asyncHandler(async (req, res) => {
 
   const placeOrder = await Order.create({
     orderPrice,
-    division,
-    district,
+    customer,
+    status,
+    orderItems,
     address,
+    city,
+    district,
+    zip,
     phone,
-    orderedItem: orderItems,
   });
 
   if (!placeOrder) {
