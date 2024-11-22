@@ -29,6 +29,7 @@ const paymentInitiate = asyncHandler(async (req, res) => {
     cus_email: "cust@yahoo.com",
     cus_add1: order.address,
     cus_city: order.city,
+    cus_country: "Bangladesh",
     cus_postcode: order.zip,
     cus_phone: order.phone,
     // cus_fax: "01711111111",

@@ -24,6 +24,7 @@ const createOrder = asyncHandler(async (req, res) => {
   }
 
   const orderedItem = await Cart.findById(orderItems);
+  console.log(orderedItem);
 
   if (!orderedItem) {
     throw new ApiError(400, "No ordered item found");
