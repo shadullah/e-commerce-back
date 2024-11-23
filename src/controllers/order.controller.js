@@ -51,4 +51,20 @@ const createOrder = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, placeOrder, "Order placed succes!!"));
 });
 
-export { createOrder };
+const getUserOrder = asyncHandler(async (req, res) => {
+  const { id } = req.params; // userId = id
+
+  const orders = await Order.find({ customer: id }).populate("orderItems");
+  if (!orders) {
+    throw new ApiError(400, "order not found");
+  }
+  // console.log(orders);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, orders, "orders fetched successfully!!"));
+});
+
+export { createOrder, getUserOrder };
+
+// const AllOrders = asyncHandler(async (req, res) => {});
