@@ -7,10 +7,22 @@ import { ApiError } from "../utils/ApiError.js";
 
 const paymentInitiate = asyncHandler(async (req, res) => {
   const { orderId } = req.body;
+  console.log(orderId);
 
   const order = await Order.findById(orderId);
+  console.log(order);
   if (!order) {
     throw new ApiError(400, "Order not found");
+  }
+
+  const existingPayment = await Payment.findOne({ orderId });
+
+  if (existingPayment) {
+    console.log("Existing payment found", existingPayment);
+    return res.status(200).json({
+      message: "Payment already initiated",
+      paymentUrl: existingPayment.paymentUrl,
+    });
   }
 
   const trxId = new mongoose.Types.ObjectId().toString();
@@ -22,7 +34,7 @@ const paymentInitiate = asyncHandler(async (req, res) => {
     // orderPrice: payInfo.orderPrice,
     currency: "BDT",
     tran_id: trxId,
-    success_url: "http://localhost:8000/success",
+    success_url: "http://localhost:8000/api/v1/payments/success",
     fail_url: "http://localhost:8000/failed",
     cancel_url: "http://localhost:8000/cancelled",
     cus_name: order.customer,
@@ -67,7 +79,7 @@ const paymentInitiate = asyncHandler(async (req, res) => {
       customer: order.customer,
       paymentId: trxId,
       orderPrice: order.orderPrice,
-      orderId: order._id,
+      orderId: order?._id,
     });
 
     const saveRes = await newPayment.save();
@@ -84,4 +96,43 @@ const paymentInitiate = asyncHandler(async (req, res) => {
   }
 });
 
-export { paymentInitiate };
+const successPayment = asyncHandler(async (req, res) => {
+  const successdata = req.body;
+  console.log(successdata);
+
+  if (successdata.status !== "VALID") {
+    throw new ApiError(404, " Invalid Payment");
+  }
+
+  try {
+    const updatedPayment = await Payment.findOneAndUpdate(
+      { paymentId: successdata.tran_id },
+      { status: "Success" },
+      { new: true }
+    );
+
+    if (!updatedPayment) {
+      throw new ApiError(404, "Payment not found");
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      updatedPayment.orderId,
+      { isPaid: true },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      throw new ApiError(404, "Order not found");
+    }
+
+    console.log("Order updated successfully:", updatedOrder);
+
+    res.status(200).redirect("http://localhost:3000/payment/success");
+  } catch (error) {
+    console.error("Payment update failed", error.message);
+    res.status(500).json({ error: "Payment update failed" });
+  }
+  console.log("successData", successdata);
+});
+
+export { paymentInitiate, successPayment };

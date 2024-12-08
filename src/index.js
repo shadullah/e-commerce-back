@@ -15,31 +15,6 @@ app.get("/", (req, res) => {
   res.send("welcome to lazz pharma backend");
 });
 
-app.post("/success", async (req, res) => {
-  const successdata = req.body;
-
-  if (successdata.status !== "VALID") {
-    throw new ApiError(404, " Invalid Payment");
-  }
-
-  try {
-    const updatedPayment = await Payment.findOneAndUpdate(
-      { paymentId: successdata.tran_id },
-      { status: "Success" },
-      { new: true }
-    );
-
-    if (!updatedPayment) {
-      throw new ApiError(404, "Payment not found");
-    }
-    res.status(200).redirect("http://localhost:3000/payment/success");
-  } catch (error) {
-    console.error("Payment update failed", error.message);
-    res.status(500).json({ error: "Payment update failed" });
-  }
-  console.log("successData", successdata);
-});
-
 app.post("/failed", async (req, res) => {
   try {
     res.redirect("http://localhost:3000/payment/fail");

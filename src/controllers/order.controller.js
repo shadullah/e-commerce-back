@@ -48,7 +48,13 @@ const createOrder = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, placeOrder, "Order placed succes!!"));
+    .json(
+      new ApiResponse(
+        200,
+        placeOrder,
+        "Order placed success And Cart cleared!!"
+      )
+    );
 });
 
 const getUserOrder = asyncHandler(async (req, res) => {
