@@ -46,6 +46,12 @@ const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Place Order failed");
   }
 
+  const clearMyCart = await Cart.findByIdAndDelete(orderItems);
+
+  if (!clearMyCart) {
+    throw new ApiError(400, "Cart clearation Failed!!");
+  }
+
   return res
     .status(200)
     .json(
