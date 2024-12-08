@@ -17,14 +17,11 @@ const createOrder = asyncHandler(async (req, res) => {
     phone,
   } = req.body;
 
-  console.log("request body: ", req.body);
-
   if ([district, address, city].some((field) => field?.trim() === "")) {
     throw new ApiError(400, "All fields are required");
   }
 
   const orderedItem = await Cart.findById(orderItems);
-  console.log(orderedItem);
 
   if (!orderedItem) {
     throw new ApiError(400, "No ordered item found");
@@ -44,12 +41,6 @@ const createOrder = asyncHandler(async (req, res) => {
 
   if (!placeOrder) {
     throw new ApiError(400, "Place Order failed");
-  }
-
-  const clearMyCart = await Cart.findByIdAndDelete(orderItems);
-
-  if (!clearMyCart) {
-    throw new ApiError(400, "Cart clearation Failed!!");
   }
 
   return res

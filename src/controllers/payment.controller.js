@@ -3,14 +3,13 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import axios from "axios";
 import { Payment } from "../models/payment.model.js";
 import { Order } from "../models/order.model.js";
+import { Cart } from "../models/cart.model.js";
 import { ApiError } from "../utils/ApiError.js";
 
 const paymentInitiate = asyncHandler(async (req, res) => {
   const { orderId } = req.body;
-  console.log(orderId);
 
   const order = await Order.findById(orderId);
-  console.log(order);
   if (!order) {
     throw new ApiError(400, "Order not found");
   }
@@ -18,7 +17,6 @@ const paymentInitiate = asyncHandler(async (req, res) => {
   const existingPayment = await Payment.findOne({ orderId });
 
   if (existingPayment) {
-    console.log("Existing payment found", existingPayment);
     return res.status(200).json({
       message: "Payment already initiated",
       paymentUrl: existingPayment.paymentUrl,
@@ -73,8 +71,6 @@ const paymentInitiate = asyncHandler(async (req, res) => {
       },
     });
 
-    // console.log(amount);
-
     const newPayment = new Payment({
       customer: order.customer,
       paymentId: trxId,
@@ -84,7 +80,7 @@ const paymentInitiate = asyncHandler(async (req, res) => {
 
     const saveRes = await newPayment.save();
 
-    console.log("Payment initiation successful", response.data);
+    // console.log("Payment initiation successful", response.data);
     if (saveRes) {
       res.send({
         paymentUrl: response.data.GatewayPageURL,
@@ -98,7 +94,6 @@ const paymentInitiate = asyncHandler(async (req, res) => {
 
 const successPayment = asyncHandler(async (req, res) => {
   const successdata = req.body;
-  console.log(successdata);
 
   if (successdata.status !== "VALID") {
     throw new ApiError(404, " Invalid Payment");
@@ -115,6 +110,8 @@ const successPayment = asyncHandler(async (req, res) => {
       throw new ApiError(404, "Payment not found");
     }
 
+    console.log(updatedPayment);
+
     const updatedOrder = await Order.findByIdAndUpdate(
       updatedPayment.orderId,
       { isPaid: true },
@@ -127,12 +124,18 @@ const successPayment = asyncHandler(async (req, res) => {
 
     console.log("Order updated successfully:", updatedOrder);
 
+    const clearMyCart = await Cart.findByIdAndDelete(updatedOrder.orderItems);
+
+    if (!clearMyCart) {
+      throw new ApiError(400, "Cart clearation Failed!!");
+    }
+
     res.status(200).redirect("http://localhost:3000/dashboard/overview_order");
   } catch (error) {
     console.error("Payment update failed", error.message);
     res.status(500).json({ error: "Payment update failed" });
+    res.status(200).redirect("http://localhost:3000/dashboard/overview_order");
   }
-  console.log("successData", successdata);
 });
 
 export { paymentInitiate, successPayment };
