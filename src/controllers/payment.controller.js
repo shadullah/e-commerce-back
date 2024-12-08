@@ -127,7 +127,7 @@ const successPayment = asyncHandler(async (req, res) => {
 
     console.log("Order updated successfully:", updatedOrder);
 
-    res.status(200).redirect("http://localhost:3000/payment/success");
+    res.status(200).redirect("http://localhost:3000/dashboard/overview_order");
   } catch (error) {
     console.error("Payment update failed", error.message);
     res.status(500).json({ error: "Payment update failed" });
